@@ -1,0 +1,55 @@
+#!/usr/bin/dc
+# sqrt: Computes the square root of a number with arbitrary precision
+# Copyright (C) 2015  Jaime Mosquera
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+##############################################################################
+##                          ALGORITHM for sqrt(n)                           ##
+##############################################################################
+## (1) Let i=0 and s=1                                                      ##
+## (2) Let a=n-(i^2)                                                        ##
+## (3) If a>0, let i=i+s and go to (2)                                      ##
+## (4) If a<0, let i=i-s and s=s/2 and go to (2)                            ##
+## (5) If a=0 or s=0, i is (the closest we can get to) the square root of n ##
+##############################################################################
+
+# Registers
+# (only those not used for macros or strings)
+## a: n-(i^2)     (approximation to 0)
+## i: Square root (iterator)
+## n: Number
+## r: Level of recursion (used for Q)
+## s: Step
+
+# Strings
+[Decimal precision: ]sP      # Ask for the maximum number of decimals
+[Number: ]sN                 # Ask for the number to find its square root
+[Error: negative number]sE   # Throw an error about getting a negative number
+[Result: ]sR                 # Show the final square root
+
+# Macros
+## e (error): Print "Error: negative number" and quit
+[lEpq]se
+## f (forward): Add s to i and repeat the loop
+[lils+si]sf
+## b (back): Subtract s from i, divide the step by half and repeat the loop
+[lils-sils2/ss]sb
+## x (exit): Exit from all loops
+[lrQ]sx
+## m: Main loop: check what to do depending on i
+[lr1+srlnlid*-sa0la>f0la<b0dla=xls=xlmxlr1-sr]sm
+
+# Program
+_2srlPP?klNP?d0>esn0si1sslmxlRPlipq
