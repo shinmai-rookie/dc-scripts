@@ -1,0 +1,58 @@
+#!/usr/bin/dc
+# float: Return the binary representation of an IEEE 754-compatible
+#       floating-point number
+# Copyright (C) 2015  Jaime Mosquera
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# TODO: Actually implement the algorithm
+
+##############################################################################
+##                          ALGORITHM for float(n)                          ##
+##            (Just for calculating the base, not the exponent)             ##
+##############################################################################
+## (1) Let e be the size of the base, i=floor(log2(n)) and r=0              ##
+## (2) Let n=n-(2^i)                                                        ##
+## (3) If e = 0 go to (8)                                                   ##
+## (4) Let i=i-1                                                            ##
+## (5) If n < 2^i,  let e=e-1 and go to (3)                                 ##
+## (6) If n >= 2^i, let r=r+10^e and e=e-1 and go to (2)                    ##
+## (7) Now r is the binary value of the exponent of the original n          ##
+##############################################################################
+
+# Registers
+# (only those not used for macros or strings)
+## !: An error has happened
+## i: log2(p)
+## n: Number
+## r: Level of recursion (used for Q)
+## p: Precision
+
+# Strings
+[Precision (in bits): ]sP              # Ask for the size of the float
+[Number: ]sN                           # Ask for the actual float
+[Error: not a valid precision]sE       # Warn of an invalid precision
+
+# Macros
+## e (error): Show an error stating that the given precision is not valid
+[lEpq]se
+## : (loop): Run b again
+[lbx]s:
+## f (fail): Set ! to 1 to show that there is an error
+[1s!]sf
+## b (bi): Check whether the precision is a valid power of two
+[2li1+dsi^dlp<flp>:]sb
+
+# Program
+0s!3silPP0?dsplbxl!1=elNP0?snlnpq
