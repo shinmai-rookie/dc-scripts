@@ -34,25 +34,49 @@
 # Registers
 # (only those not used for macros or strings)
 ## !: An error has happened
-## i: log2(p)
+## i: log2(p) and, afterwards, the size of the exponent
 ## n: Number
-## r: Level of recursion (used for Q)
 ## p: Precision
+## r: Result
+## s: Subnormal (non-normalized) number
 
 # Strings
 [Precision (in bits): ]sP              # Ask for the size of the float
 [Number: ]sN                           # Ask for the actual float
 [Error: not a valid precision]sE       # Warn of an invalid precision
+[Error: overflow]sO                    # Exit on overflow
+[Error: underflow]sU                   # Exit on underflow
 
 # Macros
 ## e (error): Show an error stating that the given precision is not valid
 [lEpq]se
-## : (loop): Run b again
-[lbx]s:
+## 0 (show overflow): Show an error stating that the number is too big to be
+##         representable with the given precision
+[lOpq]s0
+## u (show underflow): Show an error stating that the number is too small to
+##         be representable with the given precision
+[lUpq]su
 ## f (fail): Set ! to 1 to show that there is an error
 [1s!]sf
+## : (loop): Run b again
+[lbx]s:
 ## b (bi): Check whether the precision is a valid power of two
 [2li1+dsi^dlp<flp>:]sb
+## + (+1): Add one to the size of the exponent (used with single precision)
+[li1+si]s+
+## ; (loop): Run x again
+[lxx]s;
+## x (exponent): Calculates the exponent (it stores it in p, which is no
+##         longer needed)
+[2lp1+dsi^dlp<flp>;]sx
+## o (overflow): Test whether the number is overflowing or underflowing
+[2 2li1-^^dln!<02/dln*0!<<2lp1-li-^*ln*1>u]so
+## < (subnormal): Set the s register to 1
+[1ss]s<
+## | (because |n|=abs(n)): Set n to a positive number
+[ln_1*psn]s|
+## q (quit): Show number and quit
+[lrpq]sq
 
 # Program
-0s!3silPP0?dsplbxl!1=elNP0?snlnpq
+2000k0s!3silPP0?dsplbx10lp^dsrl!1=eli4*13-silp32=+lNP0?dsn0>|0=q0splox
